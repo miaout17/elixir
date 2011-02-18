@@ -54,7 +54,7 @@ false = z.forward.forward.at_end
 
 object Brainfuck
   def constructor(code)
-    code_list = code.to_list.map -> (c) String.new([c])
+    code_list = code.to_list
     % IO.puts code_list.inspect
     code_zipper = ListZipper.new code_list
 
@@ -101,18 +101,18 @@ object Brainfuck
   % Lack of case..match :)
   def branch_level(dir, opcode)
     case {dir, opcode}
-      match {'forward, "]"} then -1
-      match {'forward, "["} then 1
-      match {'back, "["} then -1
-      match {'back, "]"} then 1
+      match {'forward, $]} then -1
+      match {'forward, $\[} then 1
+      match {'back, $\[} then -1
+      match {'back, $]} then 1
       else 0
     end
   end
 
-  def branch('forward, "]", 1)
+  def branch('forward, $], 1)
     forward
   end
-  def branch('back, "[", 1)
+  def branch('back, $\[, 1)
     forward
   end
   def branch(dir, last_opcode, level)
@@ -120,23 +120,23 @@ object Brainfuck
     new_state.branch(dir, new_state.opcode, level + branch_level(dir, last_opcode))
   end
 
-  def run_op "+"
+  def run_op $+
     modify_mem(1).forward
   end
 
-  def run_op "-"
+  def run_op $-
     modify_mem(-1).forward
   end
 
-  def run_op ">"
+  def run_op $>
     move('forward).forward
   end
 
-  def run_op "<"
+  def run_op $<
     move('back).forward
   end
 
-  def run_op "["
+  def run_op $\[
     if memget == 0
       branch('forward, opcode, 0)
     else
@@ -144,7 +144,7 @@ object Brainfuck
     end
   end
 
-  def run_op "]"
+  def run_op $]
     if memget != 0
       branch('back, opcode, 0)
     else
@@ -152,13 +152,13 @@ object Brainfuck
     end
   end
 
-  def run_op "."
+  def run_op $.
     Erlang.io.format [memget]
     forward
   end
 
   % ! is not a traditional brainfuck command, prints memory content as integer
-  def run_op "!"
+  def run_op $!
     IO.puts memget.inspect
     forward
   end

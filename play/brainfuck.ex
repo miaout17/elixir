@@ -115,20 +115,14 @@ object Brainfuck
   end
 
   % Lack of case..match :)
-  def branch_level('forward, "]")
-    -1
-  end
-  def branch_level('forward, "[")
-    1
-  end
-  def branch_level('back, "[")
-    -1
-  end
-  def branch_level('back, "]")
-    1
-  end
-  def branch_level(_, _)
-    0
+  def branch_level(dir, opcode)
+    case {dir, opcode}
+      match {'forward, "]"} then -1
+      match {'forward, "["} then 1
+      match {'back, "["} then -1
+      match {'back, "]"} then 1
+      else 0
+    end
   end
 
   def branch('forward, "]", 1)

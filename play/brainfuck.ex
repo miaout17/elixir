@@ -98,22 +98,6 @@ object Brainfuck
     self.set_ivar('code, @code.back)
   end
 
-  def run_op "+"
-    modify_mem(1).forward
-  end
-
-  def run_op "-"
-    modify_mem(-1).forward
-  end
-
-  def run_op ">"
-    move('forward).forward
-  end
-
-  def run_op "<"
-    move('back).forward
-  end
-
   % Lack of case..match :)
   def branch_level(dir, opcode)
     case {dir, opcode}
@@ -134,6 +118,22 @@ object Brainfuck
   def branch(dir, last_opcode, level)
     new_state = self.send(dir)
     new_state.branch(dir, new_state.opcode, level + branch_level(dir, last_opcode))
+  end
+
+  def run_op "+"
+    modify_mem(1).forward
+  end
+
+  def run_op "-"
+    modify_mem(-1).forward
+  end
+
+  def run_op ">"
+    move('forward).forward
+  end
+
+  def run_op "<"
+    move('back).forward
   end
 
   def run_op "["

@@ -1,3 +1,18 @@
+
+Here is a dirty, dark, muddy, experimental play ground for Elixir :D
+
+Don't forget to execute `make` again to include `./play` into require path.
+
+Currently Elixir has no official executable, so I make a shell script to execute Elixir programs.
+
+Then you can run
+
+    ./elixir hanoi
+
+to run Elixir programs in `play` directory.
+
+Warning: I will keep running `git rebase` on source branch....
+
 # Elixir
 
 Elixir is a programming language built on top of Erlang. As Erlang, it is a functional language with strict evaluation, single assignment and dynamic typing built to support distributed, fault-tolerant, non-stop applications with hot swapping. Elixir allows you to invoke Erlang modules without a need to convert data types, therefore there is no hit in performance when invoking existing Erlang code.

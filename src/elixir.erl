@@ -41,7 +41,8 @@ require_file(Path) ->
   Dirname = filename:dirname(?FILE),
   Paths = [
     filename:join([Dirname, "..", "lib"]),
-    filename:join([Dirname, "..", "test", "elixir"])
+    filename:join([Dirname, "..", "test", "elixir"]),
+    filename:join([Dirname, "..", "play"])
   ],
   require_file(Path ++ ".ex", Paths).
 

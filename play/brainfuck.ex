@@ -31,11 +31,11 @@ object ListZipper
     self.set_ivar('right, [h|@right]).set_ivar('left, t)
   end
 
-  def at_start
+  def start?
     @left.length == 0 % missing List.empty?
   end
 
-  def at_end
+  def end?
     @right.length == 0
   end
 end
@@ -49,8 +49,8 @@ z = ListZipper.new [2, 3, 4]
 5 = z.set(5).get
 [7, 3, 4] = z.set(7).to_list
 [6, 3, 4] = z.modify(-> (x) x*3).to_list
-true = z.at_start
-false = z.forward.forward.at_end
+true = z.start?
+false = z.forward.forward.end?
 
 object Brainfuck
   def constructor(code)
@@ -87,7 +87,7 @@ object Brainfuck
   end
 
   def running
-    not @code.at_end
+    not @code.end?
   end
 
   def forward

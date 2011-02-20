@@ -52,126 +52,127 @@ z = ListZipper.new [2, 3, 4]
 true = z.start?
 false = z.forward.forward.end?
 
-object Brainfuck
-  def constructor(code)
-    code_list = code.to_list
-    % IO.puts code_list.inspect
-    code_zipper = ListZipper.new code_list
+module Brainfuck
+  object VM
+    def constructor(code)
+      code_list = code.to_list
+      % IO.puts code_list.inspect
+      code_zipper = ListZipper.new code_list
 
-    % TODO: STDLIB missing lists:duplicate
-    mem_list = Erlang.lists.duplicate 1000, 0
-    mem_zipper = ListZipper.new mem_list
-    {'code: code_zipper, 'mem: mem_zipper}
-  end
-
-  def opcode
-    @code.get
-  end
-
-  def memget
-    @mem.get
-  end
-
-  def memset(val)
-    self.set_ivar('mem, @mem.set(val))
-  end
-
-  def modify_mem(diff)
-    new_value = memget + diff
-    normalized = (new_value + 256) rem 256
-    memset(normalized)
-  end
-
-  def move(dir)
-    self.set_ivar('mem, @mem.send(dir))
-  end
-
-  def running
-    not @code.end?
-  end
-
-  def forward
-    self.set_ivar('code, @code.forward)
-  end
-
-  def back
-    self.set_ivar('code, @code.back)
-  end
-
-  % Lack of case..match :)
-  def branch_level(dir, opcode)
-    case {dir, opcode}
-      match {'forward, $]} then -1
-      match {'forward, $\[} then 1
-      match {'back, $\[} then -1
-      match {'back, $]} then 1
-      else 0
+      % TODO: STDLIB missing lists:duplicate
+      mem_list = Erlang.lists.duplicate 1000, 0
+      mem_zipper = ListZipper.new mem_list
+      {'code: code_zipper, 'mem: mem_zipper}
     end
-  end
 
-  def branch('forward, $], 1)
-    self
-  end
-  def branch('back, $\[, 1)
-    self
-  end
-  def branch(dir, last_opcode, level)
-    new_state = self.send(dir)
-    new_state.branch(dir, new_state.opcode, level + branch_level(dir, last_opcode))
-  end
+    def opcode
+      @code.get
+    end
 
-  def run_op $+
-    modify_mem(1)
-  end
+    def memget
+      @mem.get
+    end
 
-  def run_op $-
-    modify_mem(-1)
-  end
+    def memset(val)
+      self.set_ivar('mem, @mem.set(val))
+    end
 
-  def run_op $>
-    move('forward)
-  end
+    def modify_mem(diff)
+      new_value = memget + diff
+      normalized = (new_value + 256) rem 256
+      memset(normalized)
+    end
 
-  def run_op $<
-    move('back)
-  end
+    def move(dir)
+      self.set_ivar('mem, @mem.send(dir))
+    end
 
-  def run_op $\[
-    if memget == 0
-      branch('forward, opcode, 0)
-    else
+    def running
+      not @code.end?
+    end
+
+    def forward
+      self.set_ivar('code, @code.forward)
+    end
+
+    def back
+      self.set_ivar('code, @code.back)
+    end
+
+    % Lack of case..match :)
+    def branch_level(dir, opcode)
+      case {dir, opcode}
+        match {'forward, $]} then -1
+        match {'forward, $\[} then 1
+        match {'back, $\[} then -1
+        match {'back, $]} then 1
+        else 0
+      end
+    end
+
+    def branch('forward, $], 1)
       self
     end
-  end
-
-  def run_op $]
-    if memget != 0
-      branch('back, opcode, 0)
-    else
+    def branch('back, $\[, 1)
       self
     end
-  end
+    def branch(dir, last_opcode, level)
+      new_state = self.send(dir)
+      new_state.branch(dir, new_state.opcode, level + branch_level(dir, last_opcode))
+    end
 
-  def run_op $.
-    Erlang.io.format [memget]
-    self
-  end
+    def run_op $+
+      modify_mem(1)
+    end
 
-  % ! is not a traditional brainfuck command, prints memory content as integer
-  def run_op $!
-    IO.puts memget.inspect
-    self
-  end
+    def run_op $-
+      modify_mem(-1)
+    end
 
-  def run_op _opc
-    self
-  end
+    def run_op $>
+      move('forward)
+    end
 
-  def run
-    new_state = run_op(opcode).forward
-    if new_state.running
-      new_state.run
+    def run_op $<
+      move('back)
+    end
+
+    def run_op $\[
+      if memget == 0
+        branch('forward, opcode, 0)
+      else
+        self
+      end
+    end
+
+    def run_op $]
+      if memget != 0
+        branch('back, opcode, 0)
+      else
+        self
+      end
+    end
+
+    def run_op $.
+      Erlang.io.format [memget]
+      self
+    end
+
+    % ! is not a traditional brainfuck command, prints memory content as integer
+    def run_op $!
+      IO.puts memget.inspect
+      self
+    end
+
+    def run_op _opc
+      self
+    end
+
+    def run
+      new_state = run_op(opcode).forward
+      if new_state.running
+        new_state.run
+      end
     end
   end
-
 end

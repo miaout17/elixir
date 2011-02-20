@@ -110,10 +110,10 @@ object Brainfuck
   end
 
   def branch('forward, $], 1)
-    forward
+    self
   end
   def branch('back, $\[, 1)
-    forward
+    self
   end
   def branch(dir, last_opcode, level)
     new_state = self.send(dir)
@@ -121,26 +121,26 @@ object Brainfuck
   end
 
   def run_op $+
-    modify_mem(1).forward
+    modify_mem(1)
   end
 
   def run_op $-
-    modify_mem(-1).forward
+    modify_mem(-1)
   end
 
   def run_op $>
-    move('forward).forward
+    move('forward)
   end
 
   def run_op $<
-    move('back).forward
+    move('back)
   end
 
   def run_op $\[
     if memget == 0
       branch('forward, opcode, 0)
     else
-      forward
+      self
     end
   end
 
@@ -148,27 +148,27 @@ object Brainfuck
     if memget != 0
       branch('back, opcode, 0)
     else
-      forward
+      self
     end
   end
 
   def run_op $.
     Erlang.io.format [memget]
-    forward
+    self
   end
 
   % ! is not a traditional brainfuck command, prints memory content as integer
   def run_op $!
     IO.puts memget.inspect
-    forward
+    self
   end
 
   def run_op _opc
-    forward
+    self
   end
 
   def run
-    new_state = run_op(opcode)
+    new_state = run_op(opcode).forward
     if new_state.running
       new_state.run
     end
